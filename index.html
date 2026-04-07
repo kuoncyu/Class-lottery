@@ -29,7 +29,7 @@
         #settingsBtn { position: fixed; top: 20px; right: 20px; z-index: 1001; font-size: 1.5rem; background: #333; border: 1px solid #555; color: white; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); padding: 0; }
         #settingsBtn:hover { background: #555; transform: rotate(90deg); }
 
-        /* 後台管理區 (改為右側滑出面板) */
+        /* 後台管理區 */
         #sidebar { position: fixed; top: 0; right: -400px; height: 100vh; width: 380px; background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); padding: 20px; display: flex; flex-direction: column; border-left: 2px solid rgba(255,255,255,0.1); box-sizing: border-box; z-index: 1000; transition: right 0.3s ease-in-out; box-shadow: -5px 0 25px rgba(0,0,0,0.8); }
         #sidebar.active { right: 0; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -55,7 +55,7 @@
         .item-delete { background: transparent; color: #ff4444; border: none; cursor: pointer; padding: 0 5px; font-weight: bold; }
         .item-delete:hover { color: #ffaaaa; background: transparent; }
 
-        /* 畫面展示區 (佔滿全螢幕) */
+        /* 畫面展示區 */
         #main { width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .controls { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 10px; z-index: 10; border: 1px solid rgba(255,255,255,0.1); }
         
@@ -66,23 +66,24 @@
         /* --- 抽卡翻牌系統 3D 設定 --- */
         #result-display { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-content: center; width: 100%; flex: 1; perspective: 1500px; }
         
+        /* 動畫時間調慢：落下 0.8 秒 */
         .card-wrapper { 
             width: var(--card-w); 
             height: var(--card-h); 
             perspective: 1000px; 
-            animation: dropIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+            animation: dropIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
         }
         .card-wrapper.text-only { height: calc(var(--card-w) * 0.6); }
 
+        /* 動畫時間調慢：翻牌 1.2 秒 */
         .card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transition: transform 1.2s cubic-bezier(0.4, 0.2, 0.2, 1);
             transform-style: preserve-3d;
         }
 
-        /* 觸發翻牌的 Class */
         .card-wrapper.flipped .card-inner { transform: rotateY(180deg); }
 
         .card-face {
@@ -101,7 +102,6 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
         }
 
-        /* 未翻開的卡背設計 */
         .card-front {
             background: linear-gradient(135deg, #1f2937, #111827);
             border: 2px solid #4b5563;
@@ -114,16 +114,11 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* 翻開後的卡面 (結果) */
-        .card-back {
-            transform: rotateY(180deg);
-        }
+        .card-back { transform: rotateY(180deg); }
 
-        /* 全息閃卡特效 (給 SSR 和 UR 使用) */
         .card-back::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 70%); transform: rotate(30deg); pointer-events: none; opacity: 0; transition: 0.5s; z-index: 5; }
         .card-back.ssr::after, .card-back.ur::after { animation: shimmer 3s infinite linear; opacity: 1; }
         
-        /* 各等級卡片樣式 */
         .card-back.n { background: linear-gradient(180deg, #374151, #111827); border: 2px solid var(--n); color: #ddd; }
         .card-back.r { background: linear-gradient(180deg, #1e3a8a, #0f172a); border: 2px solid var(--r); }
         .card-back.s { background: linear-gradient(180deg, #064e3b, #022c22); border: 2px solid var(--s); }
@@ -133,20 +128,15 @@
         
         .card-back.text-only { background: linear-gradient(180deg, #444, #222); border: 1px solid #666; justify-content: center; }
         
-        /* 卡片內部元素重新排版 - 支援 3D 圖標 */
         .card-rarity { position: absolute; top: 5%; left: 8%; font-size: calc(var(--card-w) * 0.14); font-weight: 900; font-style: italic; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); z-index: 2; }
         .card-image-wrapper { width: 90%; height: 55%; margin-top: 15%; background: rgba(0, 0, 0, 0.4); border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2); z-index: 1; position: relative; }
-        
-        /* 替換為圖片標籤，加上立體陰影讓它跳脫背景 */
         .card-image { width: 85%; height: 85%; object-fit: contain; filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.6)); z-index: 2; }
-        
         .card-name { position: absolute; bottom: 8%; width: 85%; background: rgba(0,0,0,0.7); font-size: calc(var(--card-w) * 0.15); font-weight: bold; word-break: break-all; padding: 4px 0; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); z-index: 2; text-align: center; }
         
         @keyframes dropIn { from { transform: scale(0) translateY(-100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes shimmer { 0% { transform: translateX(-150%) translateY(-150%) rotate(45deg); } 100% { transform: translateX(150%) translateY(150%) rotate(45deg); } }
         @keyframes urPulse { 0% { box-shadow: 0 0 20px var(--ur); } 100% { box-shadow: 0 0 40px var(--ur), 0 0 20px #fca5a5; } }
         
-        /* SSR 和 UR 的動物有專屬的上下懸浮特效，S 與 SR 則給予輕微懸浮感 */
         @keyframes hoverEffect { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
         @keyframes gentleHover { 0% { transform: translateY(0); } 50% { transform: translateY(-4px); } 100% { transform: translateY(0); } }
         
@@ -155,6 +145,7 @@
         
         button { cursor: pointer; padding: 8px 15px; background: #3b82f6; color: white; border: none; border-radius: 5px; font-weight: bold; transition: 0.2s; }
         button:hover { background: #2563eb; }
+        button:disabled { background: #6b7280; cursor: not-allowed; }
         button.danger { background: #ef4444; }
         button.danger:hover { background: #dc2626; }
         button.success { background: #10b981; }
@@ -166,7 +157,6 @@
 </head>
 <body>
 
-<!-- 右上角設定齒輪 -->
 <button id="settingsBtn" onclick="toggleSettings()" title="開啟後台設定">⚙️</button>
 
 <div id="sidebar">
@@ -182,8 +172,33 @@
         <button onclick="document.getElementById('importFile').click()">匯入 (JSON)</button>
     </div>
 
-    <div class="list-container" id="studentList">
-        <!-- 學生列表將由 JS 渲染 -->
+    <div class="list-container" id="studentList"></div>
+    
+    <hr style="width:100%; border: 0.5px solid #555; margin: 15px 0;">
+
+    <h3 style="margin: 0 0 10px 0;">音樂與音效設定</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+        <label style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.9rem;">🎧 背景音樂</span>
+            <select id="bgmSelector" style="width: 180px; padding: 4px;" onchange="updateBgmSelection(this.value)">
+                <option value="auto">每日自動切換 (預設)</option>
+                <option value="0">烈焰交響樂 (星期日)</option>
+                <option value="1">星空科幻風 (星期一)</option>
+                <option value="2">戰神搖滾樂 (星期二)</option>
+                <option value="3">深海氛圍音 (星期三)</option>
+                <option value="4">森林大自然 (星期四)</option>
+                <option value="5">賽博電子樂 (星期五)</option>
+                <option value="6">大地木吉他 (星期六)</option>
+            </select>
+        </label>
+        <label style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.9rem;">🎵 音樂音量</span>
+            <input type="range" id="bgmVolumeSlider" min="0" max="1" step="0.05" style="width: 180px; cursor: pointer;" oninput="updateBgmVolume(this.value)">
+        </label>
+        <label style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.9rem;">🔊 音效音量</span>
+            <input type="range" id="sfxVolumeSlider" min="0" max="1" step="0.05" style="width: 180px; cursor: pointer;" oninput="updateSfxVolume(this.value)">
+        </label>
     </div>
     
     <hr style="width:100%; border: 0.5px solid #555; margin: 15px 0;">
@@ -207,7 +222,7 @@
             <input type="checkbox" id="noRepeat" style="margin-right: 5px;" onchange="updateStats()"> 不重複抽選
         </label>
         
-        <button onclick="draw()" style="font-size: 1.1rem; padding: 10px 20px;">開始抽取</button>
+        <button id="drawBtn" onclick="draw()" style="font-size: 1.1rem; padding: 10px 20px;">開始抽取</button>
         <button onclick="resetPool()" class="danger">重置不重複名單</button>
         <button onclick="toggleAudio()" id="audioBtn" style="background: #3b82f6;" title="開/關音效">🔊 音效開啟</button>
     </div>
@@ -225,38 +240,49 @@
     </div>
 </div>
 
-<!-- 更具手遊氛圍的音效資源 -->
-<audio id="bgm" src="https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3" loop preload="auto"></audio>
+<!-- 移除 crossorigin 以解除瀏覽器 CORS 阻擋 -->
+<audio id="bgm" loop preload="auto"></audio>
+<audio id="sfx-drop" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" preload="auto"></audio>
 <audio id="sfx-draw" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" preload="auto"></audio>
 <audio id="sfx-epic" src="https://assets.mixkit.co/active_storage/sfx/2060/2060-preview.mp3" preload="auto"></audio>
 
 <script>
-    // --- 資料與狀態管理 ---
     let students = [];
     let usedIds = new Set();
     let currentDrawCount = 0;
-    let audioEnabled = true; // 預設開啟音效
+    let audioEnabled = true; 
     
-    // 一週主題名稱對應
+    let bgmVolume = localStorage.getItem('gacha_bgmVolume') !== null ? parseFloat(localStorage.getItem('gacha_bgmVolume')) : 0.5;
+    let sfxVolume = localStorage.getItem('gacha_sfxVolume') !== null ? parseFloat(localStorage.getItem('gacha_sfxVolume')) : 0.5;
+    let bgmSelection = localStorage.getItem('gacha_bgmSelection') || 'auto';
+    
     const themeNames = ["烈陽 (星期日)", "星空 (星期一)", "赤炎 (星期二)", "深海 (星期三)", "翠綠 (星期四)", "霓虹 (星期五)", "岩褐 (星期六)"];
     
-    // 一週七天對應的主題背景音樂 (BGM)
+    // 換回 Mixkit 高音質手遊感音樂庫 (已解除阻擋設定)
     const themeBgmUrls = [
-        "https://cdn.pixabay.com/download/audio/2022/10/25/audio_40b15e4dc1.mp3", // 日: 史詩烈焰交響樂
-        "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3", // 一: 星空科幻環境音
-        "https://cdn.pixabay.com/download/audio/2021/08/09/audio_dc39bde808.mp3", // 二: 戰神熱血搖滾
-        "https://cdn.pixabay.com/download/audio/2022/05/16/audio_b287cdce57.mp3", // 三: 深海寧靜氛圍
-        "https://cdn.pixabay.com/download/audio/2021/11/24/audio_9ebfbfa951.mp3", // 四: 森林大自然旋律
-        "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3", // 五: 賽博霓虹電子樂
-        "https://cdn.pixabay.com/download/audio/2021/10/06/audio_031f81640a.mp3"  // 六: 大地木吉他輕音樂
+        "https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3", 
+        "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3", 
+        "https://assets.mixkit.co/music/preview/mixkit-sports-highlights-51.mp3", 
+        "https://assets.mixkit.co/music/preview/mixkit-deep-urban-623.mp3", 
+        "https://assets.mixkit.co/music/preview/mixkit-just-chill-16.mp3", 
+        "https://assets.mixkit.co/music/preview/mixkit-sleepy-cat-135.mp3", 
+        "https://assets.mixkit.co/music/preview/mixkit-spirit-me-away-154.mp3"  
     ];
 
     function init() {
-        // 設定今日主題背景與對應音樂
         const dayOfWeek = new Date().getDay();
         document.body.className = `theme-${dayOfWeek}`;
         document.getElementById('themeName').innerText = themeNames[dayOfWeek];
-        document.getElementById('bgm').src = themeBgmUrls[dayOfWeek]; // 載入今日主題音樂
+        
+        document.getElementById('bgmSelector').value = bgmSelection;
+        document.getElementById('bgmVolumeSlider').value = bgmVolume;
+        document.getElementById('sfxVolumeSlider').value = sfxVolume;
+
+        const bgmElement = document.getElementById('bgm');
+        let trackIndex = bgmSelection === 'auto' ? dayOfWeek : parseInt(bgmSelection);
+        bgmElement.src = themeBgmUrls[trackIndex]; 
+        bgmElement.volume = bgmVolume; 
+        bgmElement.load(); 
 
         loadData();
         renderStudents();
@@ -293,8 +319,8 @@
         if (audioEnabled) {
             btn.innerText = '🔊 音效開啟';
             btn.style.background = '#3b82f6';
-            bgm.volume = 0.25;
-            bgm.play().catch(e => console.log("瀏覽器阻擋自動播放", e));
+            bgm.volume = bgmVolume; 
+            bgm.play().catch(e => console.log("播放失敗", e));
         } else {
             btn.innerText = '🔇 音效關閉';
             btn.style.background = '#4b5563';
@@ -303,12 +329,49 @@
     }
 
     function playSfx(type) {
-        if (!audioEnabled) return;
-        const sound = document.getElementById(type === 'epic' ? 'sfx-epic' : 'sfx-draw');
+        if (!audioEnabled || sfxVolume === 0) return;
+        
+        let soundId = 'sfx-draw';
+        if (type === 'epic') soundId = 'sfx-epic';
+        if (type === 'drop') soundId = 'sfx-drop';
+        
+        const sound = document.getElementById(soundId);
         if (sound) {
-            sound.currentTime = 0;
-            sound.volume = type === 'epic' ? 0.7 : 0.5;
-            sound.play().catch(e => console.log("音效播放失敗", e));
+            // 利用 cloneNode 讓連抽時的音效可以重疊播放，不會被卡斷
+            const clone = sound.cloneNode();
+            clone.volume = type === 'epic' ? Math.min(sfxVolume * 1.4, 1.0) : sfxVolume; 
+            clone.play().catch(e => console.log("音效播放失敗", e));
+        }
+    }
+
+    function updateBgmVolume(val) {
+        bgmVolume = parseFloat(val);
+        localStorage.setItem('gacha_bgmVolume', bgmVolume);
+        const bgm = document.getElementById('bgm');
+        bgm.volume = bgmVolume;
+        if (!audioEnabled && bgmVolume > 0) toggleAudio();
+    }
+
+    function updateSfxVolume(val) {
+        sfxVolume = parseFloat(val);
+        localStorage.setItem('gacha_sfxVolume', sfxVolume);
+        if (!audioEnabled && sfxVolume > 0) toggleAudio();
+    }
+
+    function updateBgmSelection(val) {
+        bgmSelection = val;
+        localStorage.setItem('gacha_bgmSelection', bgmSelection);
+        
+        const bgmElement = document.getElementById('bgm');
+        const dayOfWeek = new Date().getDay();
+        const trackIndex = bgmSelection === 'auto' ? dayOfWeek : parseInt(bgmSelection);
+        
+        bgmElement.src = themeBgmUrls[trackIndex];
+        bgmElement.load();
+        
+        if (audioEnabled) {
+            bgmElement.volume = bgmVolume;
+            bgmElement.play().catch(e => console.log("切換音樂播放失敗", e));
         }
     }
 
@@ -504,6 +567,8 @@
         const count = parseInt(document.getElementById('drawCount').value) || 1;
         const noRepeat = document.getElementById('noRepeat').checked;
         const display = document.getElementById('result-display');
+        const drawBtn = document.getElementById('drawBtn');
+        
         display.innerHTML = '';
 
         let pool = [];
@@ -516,8 +581,12 @@
 
         if (pool.length === 0) return alert("抽取名單不能為空！");
 
-        if (audioEnabled && document.getElementById('bgm').paused) {
-            document.getElementById('bgm').play().catch(e => {});
+        const bgm = document.getElementById('bgm');
+        if (audioEnabled) {
+            bgm.volume = bgmVolume;
+            if (bgm.paused) {
+                bgm.play().catch(e => console.log("音樂仍被阻擋", e));
+            }
         }
 
         let availablePool = pool;
@@ -544,21 +613,30 @@
         currentDrawCount = results.length;
         resizeCards(currentDrawCount);
 
-        // 依序落下卡背，再延遲翻牌
+        // 抽卡期間暫時停用按鈕，避免畫面與音效錯亂
+        drawBtn.disabled = true;
+
+        // 節奏大幅調慢：落下後等更久再翻開
         results.forEach((winner, idx) => {
             setTimeout(() => {
                 const cardWrapper = createCard(winner, mode);
-                playSfx('draw'); // 發牌音效
+                playSfx('drop'); // 落下時的發牌音效
                 
-                // 延遲後執行翻牌特效
                 setTimeout(() => {
                     cardWrapper.classList.add('flipped');
+                    playSfx('draw'); // 翻轉瞬間的亮牌音效
+                    
                     if (winner.rarity === 'SSR' || winner.rarity === 'UR') {
-                        playSfx('epic'); // 翻出大獎的音效
+                        setTimeout(() => playSfx('epic'), 300); // 大獎音效稍微延遲播放
                     }
-                }, 400); // 落下後等 0.4 秒再翻開
+                    
+                    // 等最後一張牌翻完，重新啟用按鈕
+                    if (idx === results.length - 1) {
+                        setTimeout(() => drawBtn.disabled = false, 1200);
+                    }
+                }, 1500); // 落下後等 1.5 秒才翻牌 (原本 0.8)
                 
-            }, idx * 150); // 每 0.15 秒發一張牌
+            }, idx * 800); // 連抽時，每張牌間隔 0.8 秒落下 (原本 0.4)
         });
         
         updateStats();
@@ -624,20 +702,16 @@
     function createCard(data, mode) {
         const display = document.getElementById('result-display');
         
-        // 建立 3D 翻轉的外部容器
         const wrapper = document.createElement('div');
         wrapper.className = mode === 'student' ? 'card-wrapper' : 'card-wrapper text-only';
         
-        // 建立旋轉內核
         const inner = document.createElement('div');
         inner.className = 'card-inner';
 
-        // 建立卡背 (抽卡前的樣子)
         const front = document.createElement('div');
         front.className = 'card-face card-front';
-        front.innerHTML = '❓'; // 卡背顯示問號
+        front.innerHTML = '❓';
 
-        // 建立卡面 (抽出來的結果)
         const back = document.createElement('div');
         back.className = `card-face card-back ${data.rarity ? data.rarity.toLowerCase() : 'text-only'}`;
         
@@ -654,27 +728,30 @@
             back.innerHTML = `<div class="card-name">${data.name}</div>`;
         }
         
-        // 組合卡片
         inner.appendChild(front);
         inner.appendChild(back);
         wrapper.appendChild(inner);
         display.appendChild(wrapper);
         
-        return wrapper; // 回傳 wrapper 讓外部控制翻牌時機
+        return wrapper; 
     }
 
     function toggleSettings() {
         document.getElementById('sidebar').classList.toggle('active');
     }
 
-    // 解決瀏覽器阻擋自動播放機制：只要使用者在網頁上點擊任何地方，就自動開始播音樂
-    document.body.addEventListener('click', () => {
+    const unlockAudio = () => {
         const bgm = document.getElementById('bgm');
         if (audioEnabled && bgm.paused) {
-            bgm.volume = 0.25;
-            bgm.play().catch(e => {});
+            bgm.volume = bgmVolume;
+            bgm.play().then(() => {
+                document.body.removeEventListener('click', unlockAudio);
+            }).catch(e => {
+                console.log("等待互動解鎖音樂中...");
+            });
         }
-    }, { once: true });
+    };
+    document.body.addEventListener('click', unlockAudio);
 
     init();
 </script>
