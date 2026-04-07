@@ -57,8 +57,14 @@
 
         /* 畫面展示區 */
         #main { width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .controls { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 10px; z-index: 10; border: 1px solid rgba(255,255,255,0.1); }
+        .controls { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 10px; z-index: 10; border: 1px solid rgba(255,255,255,0.1); }
         
+        /* 加減人數按鈕樣式 */
+        .count-btn { background: #4b5563; color: white; border: none; border-radius: 4px; width: 32px; height: 32px; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; padding: 0; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .count-btn:hover { background: #6b7280; }
+        .count-btn:active { transform: scale(0.9); }
+        .count-wrapper { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+
         /* 統計資訊列 */
         #statsBar { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); padding: 8px 25px; border-radius: 20px; font-size: 1rem; color: #ddd; margin-bottom: 15px; display: flex; gap: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .stat-highlight { color: #fbbf24; font-weight: bold; font-size: 1.1rem; }
@@ -215,8 +221,13 @@
             <option value="custom">自定義文字 (純文字)</option>
         </select>
         
-        <label>人數：</label>
-        <input type="number" id="drawCount" value="1" min="1" style="width: 60px;">
+        <!-- 更新：帶有 +/- 的人數調整區塊 -->
+        <div class="count-wrapper">
+            <label style="margin-left: 5px;">人數：</label>
+            <button class="count-btn" onclick="adjustCount(-1)" title="減少1人">-</button>
+            <input type="number" id="drawCount" value="1" min="1" style="width: 50px; padding: 6px; text-align: center; border: none; margin: 0; font-weight: bold;">
+            <button class="count-btn" onclick="adjustCount(1)" title="增加1人">+</button>
+        </div>
         
         <label style="display: flex; align-items: center; cursor: pointer;">
             <input type="checkbox" id="noRepeat" style="margin-right: 5px;" onchange="updateStats()"> 不重複抽選
@@ -240,7 +251,6 @@
     </div>
 </div>
 
-<!-- 移除 crossorigin 以解除瀏覽器 CORS 阻擋 -->
 <audio id="bgm" loop preload="auto"></audio>
 <audio id="sfx-drop" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" preload="auto"></audio>
 <audio id="sfx-draw" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" preload="auto"></audio>
@@ -258,7 +268,6 @@
     
     const themeNames = ["烈陽 (星期日)", "星空 (星期一)", "赤炎 (星期二)", "深海 (星期三)", "翠綠 (星期四)", "霓虹 (星期五)", "岩褐 (星期六)"];
     
-    // 換回 Mixkit 高音質手遊感音樂庫 (已解除阻擋設定)
     const themeBgmUrls = [
         "https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3", 
         "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3", 
@@ -292,6 +301,15 @@
             updateStats();
         });
         updateStats();
+    }
+
+    // --- 新增：加減人數控制函數 ---
+    function adjustCount(amount) {
+        const input = document.getElementById('drawCount');
+        let val = parseInt(input.value) || 1;
+        val += amount;
+        if (val < 1) val = 1; // 確保人數最少為 1
+        input.value = val;
     }
 
     function updateStats() {
@@ -337,7 +355,6 @@
         
         const sound = document.getElementById(soundId);
         if (sound) {
-            // 利用 cloneNode 讓連抽時的音效可以重疊播放，不會被卡斷
             const clone = sound.cloneNode();
             clone.volume = type === 'epic' ? Math.min(sfxVolume * 1.4, 1.0) : sfxVolume; 
             clone.play().catch(e => console.log("音效播放失敗", e));
@@ -613,30 +630,27 @@
         currentDrawCount = results.length;
         resizeCards(currentDrawCount);
 
-        // 抽卡期間暫時停用按鈕，避免畫面與音效錯亂
         drawBtn.disabled = true;
 
-        // 節奏大幅調慢：落下後等更久再翻開
         results.forEach((winner, idx) => {
             setTimeout(() => {
                 const cardWrapper = createCard(winner, mode);
-                playSfx('drop'); // 落下時的發牌音效
+                playSfx('drop'); 
                 
                 setTimeout(() => {
                     cardWrapper.classList.add('flipped');
-                    playSfx('draw'); // 翻轉瞬間的亮牌音效
+                    playSfx('draw'); 
                     
                     if (winner.rarity === 'SSR' || winner.rarity === 'UR') {
-                        setTimeout(() => playSfx('epic'), 300); // 大獎音效稍微延遲播放
+                        setTimeout(() => playSfx('epic'), 300); 
                     }
                     
-                    // 等最後一張牌翻完，重新啟用按鈕
                     if (idx === results.length - 1) {
                         setTimeout(() => drawBtn.disabled = false, 1200);
                     }
-                }, 1500); // 落下後等 1.5 秒才翻牌 (原本 0.8)
+                }, 1500); 
                 
-            }, idx * 800); // 連抽時，每張牌間隔 0.8 秒落下 (原本 0.4)
+            }, idx * 800); 
         });
         
         updateStats();
